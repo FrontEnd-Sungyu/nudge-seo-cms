@@ -13,14 +13,11 @@ interface SidebarProps {
   currentServiceId: string;
   /** 서비스 변경 시 호출되는 함수 */
   onServiceChange: (id: string) => void;
-  /** 서비스 추가 버튼 클릭 핸들러 */
-  onAddService: () => void;
 }
 
 export const Sidebar = ({ 
   currentServiceId, 
-  onServiceChange,
-  onAddService
+  onServiceChange
 }: SidebarProps) => {
   return (
     <div className="w-64 bg-white h-full border-r border-gray-200 flex flex-col">
@@ -65,29 +62,6 @@ export const Sidebar = ({
             </button>
           ))}
         </nav>
-      </div>
-      
-      {/* 하단 액션 영역 */}
-      <div className="border-t border-gray-200 p-4">
-        <button
-          type="button"
-          onClick={onAddService}
-          className="btn-primary w-full flex items-center justify-center"
-        >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className="h-5 w-5 mr-2" 
-            viewBox="0 0 20 20" 
-            fill="currentColor"
-          >
-            <path 
-              fillRule="evenodd" 
-              d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" 
-              clipRule="evenodd" 
-            />
-          </svg>
-          새 서비스 추가
-        </button>
       </div>
     </div>
   );

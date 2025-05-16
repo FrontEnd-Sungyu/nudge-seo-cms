@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { Sidebar } from '../../components/layout/Sidebar'
 import { KpiCard } from '../../components/dashboard/KpiCard'
 import { TrendChart } from '../../components/dashboard/TrendChart'
@@ -19,43 +20,28 @@ import {
   formatDate,
 } from '../../utils/formatter'
 
-interface ServiceDetailPageProps {
-  /** 초기 서비스 ID */
-  initialServiceId?: string
-}
-
-export const ServiceDetailPage = ({
-  initialServiceId,
-}: ServiceDetailPageProps) => {
-  // 현재 선택된 서비스 ID
-  const [currentServiceId, setCurrentServiceId] = useState<string>(
-    initialServiceId || '1',
-  )
+export const ServiceDetailPage = () => {
+  const { serviceId } = useParams<{ serviceId: string }>()
+  const navigate = useNavigate()
+  
   // 현재 서비스 데이터
   const [service, setService] = useState<Service | null>(null)
   // 서비스 증감률
   const [growth, setGrowth] = useState<ServiceGrowth | null>(null)
-  // 선택된 탭
-  const [activeTab, setActiveTab] = useState<'indexing' | 'crawl'>('indexing')
 
   // 서비스 ID가 변경되면 서비스 데이터 로드
   useEffect(() => {
     // 실제로는 API 호출이지만 목업 데이터 사용
-    const selectedService = mockServices.find((s) => s.id === currentServiceId)
+    const selectedService = mockServices.find((s) => s.id === serviceId)
     if (selectedService) {
       setService(selectedService)
-      setGrowth(getServiceGrowth(selectedService.id))
+      setGrowth(getServiceGrowth())
     }
-  }, [currentServiceId])
+  }, [serviceId])
 
   // 서비스 변경 핸들러
   const handleServiceChange = (id: string) => {
-    setCurrentServiceId(id)
-  }
-
-  // 서비스 추가 핸들러
-  const handleAddService = () => {
-    alert('서비스 추가 모달이 여기에 표시됩니다.')
+    navigate(`/services/${id}`)
   }
 
   // 원본 서치콘솔로 이동
@@ -66,11 +52,6 @@ export const ServiceDetailPage = ({
         '_blank',
       )
     }
-  }
-
-  // URL 검사 모달 열기
-  const openUrlInspection = () => {
-    alert('URL 검사 모달이 여기에 표시됩니다.')
   }
 
   if (!service || !growth) {
@@ -88,9 +69,8 @@ export const ServiceDetailPage = ({
     <div className="flex h-screen bg-gray-50">
       {/* 좌측 내비게이션 바 */}
       <Sidebar
-        currentServiceId={currentServiceId}
+        currentServiceId={serviceId || ''}
         onServiceChange={handleServiceChange}
-        onAddService={handleAddService}
       />
 
       {/* 콘텐츠 영역 */}
@@ -138,13 +118,6 @@ export const ServiceDetailPage = ({
             </div>
 
             <div className="mt-4 md:mt-0 flex space-x-2">
-              <button
-                type="button"
-                onClick={openUrlInspection}
-                className="btn-secondary text-sm"
-              >
-                URL 검사
-              </button>
               <button
                 type="button"
                 onClick={goToSearchConsole}
@@ -329,98 +302,7 @@ export const ServiceDetailPage = ({
 
           {/* 트렌드 차트 */}
           <div className="mb-6">
-            <TrendChart serviceId={service.id} />
-          </div>
-
-          {/* 색인/크롤링 탭 */}
-          <div className="card">
-            <div className="border-b border-gray-200">
-              <nav className="-mb-px flex space-x-8">
-                <button
-                  onClick={() => setActiveTab('indexing')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === 'indexing'
-                      ? 'border-primary-500 text-primary-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  색인 리포트
-                </button>
-                <button
-                  onClick={() => setActiveTab('crawl')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === 'crawl'
-                      ? 'border-primary-500 text-primary-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  크롤링 통계
-                </button>
-              </nav>
-            </div>
-
-            {/* 탭 콘텐츠 */}
-            <div className="py-4">
-              {activeTab === 'indexing' ? (
-                <div className="text-center py-12">
-                  <div className="mx-auto w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mb-4">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-8 w-8 text-primary-600"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                      />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    색인 데이터 가져오기
-                  </h3>
-                  <p className="text-gray-500 max-w-md mx-auto mb-4">
-                    Google Search Console에서 내보낸 색인 데이터 파일을 여기에
-                    업로드하여 분석 결과를 확인하세요.
-                  </p>
-                  <button type="button" className="btn-primary">
-                    CSV 파일 업로드
-                  </button>
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <div className="mx-auto w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mb-4">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-8 w-8 text-primary-600"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                      />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    크롤링 통계 가져오기
-                  </h3>
-                  <p className="text-gray-500 max-w-md mx-auto mb-4">
-                    Google Search Console에서 내보낸 크롤링 통계 파일을 여기에
-                    업로드하여 분석 결과를 확인하세요.
-                  </p>
-                  <button type="button" className="btn-primary">
-                    CSV 파일 업로드
-                  </button>
-                </div>
-              )}
-            </div>
+            <TrendChart />
           </div>
         </main>
       </div>

@@ -43,16 +43,11 @@ const generateTrendData = (days: number) => {
   return data;
 };
 
-interface TrendChartProps {
-  /** 서비스 ID */
-  serviceId: string;
-}
-
 type ChartType = 'line' | 'area';
 type MetricType = 'clicks' | 'impressions' | 'ctr' | 'position';
 type PeriodType = '7' | '30' | '90';
 
-export const TrendChart = ({ serviceId }: TrendChartProps) => {
+export const TrendChart = () => {
   // 차트 타입 상태
   const [chartType, setChartType] = useState<ChartType>('line');
   // 선택된 기간

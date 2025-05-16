@@ -115,7 +115,7 @@ export const getRandomGrowth = () => {
 /**
  * 각 서비스의 KPI 증감률 생성
  */
-export const getServiceGrowth = (serviceId: string) => {
+export const getServiceGrowth = () => {
   return {
     clicks: getRandomGrowth(),
     impressions: getRandomGrowth(),

@@ -25,7 +25,7 @@ interface ServiceCardProps {
 
 export const ServiceCard = ({ service, onClick }: ServiceCardProps) => {
   // 실제로는 API에서 가져오지만, 목업 데이터 사용
-  const [growth] = useState<ServiceGrowth>(() => getServiceGrowth(service.id))
+  const [growth] = useState<ServiceGrowth>(() => getServiceGrowth())
 
   return (
     <div

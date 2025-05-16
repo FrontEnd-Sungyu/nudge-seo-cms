@@ -6,32 +6,24 @@
  */
 
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Header } from '../../components/common/Header'
 import { ServiceCard } from '../../components/dashboard/ServiceCard'
 import { mockServices } from '../../data/mockData'
 import type { Service } from '../../types/service'
 
-interface DashboardPageProps {
-  /** 서비스 선택 핸들러 */
-  onServiceSelect: (id: string) => void;
-}
-
-export const DashboardPage = ({ onServiceSelect }: DashboardPageProps) => {
+export const DashboardPage = () => {
   const [services] = useState<Service[]>(mockServices)
-
-  // 서비스 추가 핸들러 (실제로는 모달 표시)
-  const handleAddService = () => {
-    alert('서비스 추가 모달이 여기에 표시됩니다.')
-  }
+  const navigate = useNavigate()
 
   // 서비스 카드 클릭 핸들러
   const handleServiceClick = (id: string) => {
-    onServiceSelect(id)
+    navigate(`/services/${id}`)
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header onAddService={handleAddService} />
+      <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 서비스 없을 때 표시할 내용 */}
@@ -60,25 +52,6 @@ export const DashboardPage = ({ onServiceSelect }: DashboardPageProps) => {
               Google Search Console에 연결된 서비스를 추가하여 SEO 데이터를
               모니터링하세요.
             </p>
-            <button
-              type="button"
-              onClick={handleAddService}
-              className="btn-primary inline-flex items-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-2"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              새 서비스 추가
-            </button>
           </div>
         ) : (
           <>
@@ -101,32 +74,6 @@ export const DashboardPage = ({ onServiceSelect }: DashboardPageProps) => {
                   onClick={handleServiceClick}
                 />
               ))}
-
-              {/* 서비스 추가 카드 */}
-              <div
-                className="card card-hover p-5 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center h-full min-h-[280px] cursor-pointer hover:border-primary-300 hover:bg-primary-50 transition-colors"
-                onClick={handleAddService}
-              >
-                <div className="w-12 h-12 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center mb-4">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <h3 className="font-semibold text-lg mb-1">새 서비스 추가</h3>
-                <p className="text-sm text-gray-500 text-center">
-                  Google Search Console에 연결된
-                  <br />새 서비스를 추가합니다.
-                </p>
-              </div>
             </div>
           </>
         )}
