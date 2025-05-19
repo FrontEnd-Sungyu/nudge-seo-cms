@@ -5,7 +5,7 @@
  * @description 서비스 상세 페이지에서 사용하는 좌측 내비게이션 바
  */
 
-import { mockServices } from '@/data/mockData';
+import { MONITORED_SITES } from '@/api/gscApi';
 import { formatDomain } from '@/utils/formatter';
 
 interface SidebarProps {
@@ -19,20 +19,23 @@ export const Sidebar = ({
   currentServiceId, 
   onServiceChange
 }: SidebarProps) => {
+  // 실제 API에서 가져온 모니터링 대상 사이트 목록 사용
+  const services = MONITORED_SITES;
+  
   return (
     <div className="w-64 bg-white h-full border-r border-gray-200 flex flex-col">
       {/* 헤더 */}
       <div className="px-4 py-5 border-b border-gray-200">
         <h2 className="text-lg font-medium text-gray-900">서비스 목록</h2>
         <p className="text-sm text-gray-500 mt-1">
-          등록된 {mockServices.length}개 서비스
+          등록된 {services.length}개 서비스
         </p>
       </div>
       
       {/* 서비스 목록 */}
       <div className="flex-1 overflow-y-auto py-2">
         <nav className="px-2 space-y-1">
-          {mockServices.map(service => (
+          {services.map(service => (
             <button
               key={service.id}
               className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md ${

@@ -14,18 +14,29 @@ import {
   formatGrowth,
   formatDate,
 } from '../../utils/formatter'
-import { getServiceGrowth } from '../../data/mockData'
 
 interface ServiceCardProps {
   /** 서비스 정보 객체 */
   service: Service
+  /** 서비스 증감률 정보 (선택 사항, 없으면 기본값 사용) */
+  growth?: {
+    clicks: number;
+    impressions: number;
+    ctr: number;
+    position: number;
+  }
   /** 카드 클릭시 실행할 함수 */
   onClick: (id: string) => void
 }
 
-export const ServiceCard = ({ service, onClick }: ServiceCardProps) => {
-  // 실제로는 API에서 가져오지만, 목업 데이터 사용
-  const [growth] = useState<ServiceGrowth>(() => getServiceGrowth())
+export const ServiceCard = ({ service, growth, onClick }: ServiceCardProps) => {
+  // growth 값이 없으면 기본값 사용 (0)
+  const growthData = growth || {
+    clicks: 0,
+    impressions: 0,
+    ctr: 0,
+    position: 0
+  }
 
   return (
     <div
@@ -54,14 +65,14 @@ export const ServiceCard = ({ service, onClick }: ServiceCardProps) => {
         <KpiItem
           label="클릭수"
           value={formatNumber(service.summary.clicks, true)}
-          growth={formatGrowth(growth.clicks)}
-          isPositive={growth.clicks > 0}
+          growth={formatGrowth(growthData.clicks)}
+          isPositive={growthData.clicks > 0}
         />
         <KpiItem
           label="노출수"
           value={formatNumber(service.summary.impressions, true)}
-          growth={formatGrowth(growth.impressions)}
-          isPositive={growth.impressions > 0}
+          growth={formatGrowth(growthData.impressions)}
+          isPositive={growthData.impressions > 0}
         />
       </div>
 
@@ -69,14 +80,14 @@ export const ServiceCard = ({ service, onClick }: ServiceCardProps) => {
         <KpiItem
           label="CTR"
           value={formatPercent(service.summary.ctr)}
-          growth={formatGrowth(growth.ctr)}
-          isPositive={growth.ctr > 0}
+          growth={formatGrowth(growthData.ctr)}
+          isPositive={growthData.ctr > 0}
         />
         <KpiItem
           label="평균 순위"
           value={service.summary.position.toFixed(1)}
-          growth={formatGrowth(growth.position, true)} // 순위는 낮을수록 좋음
-          isPositive={growth.position < 0}
+          growth={formatGrowth(growthData.position, true)} // 순위는 낮을수록 좋음
+          isPositive={growthData.position < 0}
         />
       </div>
 

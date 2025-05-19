@@ -12,8 +12,9 @@ import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { KpiCard } from '@/components/dashboard/KpiCard';
 import { TrendChart } from '@/components/dashboard/TrendChart';
-import { mockServices, getServiceGrowth } from '@/data/mockData';
+import { MONITORED_SITES, fetchSiteData } from '@/api/gscApi';
 import type { Service, ServiceGrowth } from '@/types/service';
+import type { GSCSiteData } from '@/api/types';
 import {
   formatDomain,
   formatNumber,
@@ -34,15 +35,87 @@ export default function ServiceDetailPage({
   const [service, setService] = useState<Service | null>(null);
   // 서비스 증감률
   const [growth, setGrowth] = useState<ServiceGrowth | null>(null);
+  // 로딩 상태
+  const [loading, setLoading] = useState<boolean>(true);
+  // 에러 상태
+  const [error, setError] = useState<string | null>(null);
 
   // 서비스 ID가 변경되면 서비스 데이터 로드
   useEffect(() => {
-    // 실제로는 API 호출이지만 목업 데이터 사용
-    const selectedService = mockServices.find((s) => s.id === serviceId);
-    if (selectedService) {
-      setService(selectedService);
-      setGrowth(getServiceGrowth());
-    }
+    // API에서 데이터 로드
+    const loadServiceData = async () => {
+      try {
+        setLoading(true);
+        
+        // API에서 사이트 데이터 가져오기
+        const siteData: GSCSiteData = await fetchSiteData(serviceId);
+        
+        // 모니터링 중인 사이트 정보 가져오기
+        const monitoredSite = MONITORED_SITES.find(s => s.id === serviceId);
+        
+        if (!monitoredSite) {
+          throw new Error('등록되지 않은 서비스입니다.');
+        }
+        
+        // 데이터를 Service 형식으로 변환
+        const rows = siteData.data.rows || [];
+        const lastRow = rows.length > 0 ? rows[rows.length - 1] : null;
+        
+        // 클릭 및 노출 수 합계 계산
+        const totalClicks = rows.reduce((sum, row) => sum + row.clicks, 0);
+        const totalImpressions = rows.reduce((sum, row) => sum + row.impressions, 0);
+        const avgCtr = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
+        
+        // 평균 포지션 계산
+        const avgPosition = rows.length > 0 
+          ? rows.reduce((sum, row) => sum + row.position, 0) / rows.length 
+          : 0;
+        
+        // ServiceGrowth 객체 생성 (API에서 제공하는 경우 사용, 없으면 0)
+        const calculatedGrowth: ServiceGrowth = {
+          clicks: 0,
+          impressions: 0,
+          ctr: 0,
+          position: 0,
+          indexed: 0,
+          notIndexed: 0,
+          crawlRequests: 0,
+          responseTime: 0
+        };
+        
+        // Service 객체 생성
+        const serviceData: Service = {
+          id: serviceId,
+          name: siteData.site.name || monitoredSite.name,
+          url: siteData.site.url || monitoredSite.url,
+          iconUrl: monitoredSite.iconUrl,
+          verified: true, // API에 접근 가능하면 인증된 것으로 간주
+          summary: {
+            clicks: totalClicks,
+            impressions: totalImpressions,
+            ctr: avgCtr,
+            position: avgPosition,
+            indexed: 0, // API에서 제공하지 않음
+            notIndexed: 0, // API에서 제공하지 않음
+            crawlRequests: 0, // API에서 제공하지 않음
+            responseTime: 0 // API에서 제공하지 않음
+          },
+          createdAt: new Date(),
+          lastUpdatedAt: new Date()
+        };
+        
+        setService(serviceData);
+        setGrowth(calculatedGrowth);
+        setError(null);
+      } catch (err) {
+        console.error('서비스 데이터 로드 중 오류 발생:', err);
+        setError('서비스 데이터를 불러오는 중 문제가 발생했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadServiceData();
   }, [serviceId]);
 
   // 서비스 변경 핸들러
@@ -60,12 +133,49 @@ export default function ServiceDetailPage({
     }
   };
 
-  if (!service || !growth) {
+  // 로딩 중이거나 데이터 없음
+  if (loading || (!service && !error)) {
     return (
       <div className="h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">서비스 데이터를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // 에러 발생
+  if (error || !service) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-center max-w-md p-8 bg-white rounded-lg shadow-md">
+          <div className="mx-auto w-16 h-16 rounded-full bg-danger-100 flex items-center justify-center mb-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-8 w-8 text-danger-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold mb-2">
+            데이터를 불러올 수 없습니다
+          </h2>
+          <p className="text-gray-500 mb-4">{error || '서비스 데이터를 찾을 수 없습니다.'}</p>
+          <button
+            onClick={() => router.push('/')}
+            className="btn-primary"
+          >
+            메인 페이지로 돌아가기
+          </button>
         </div>
       </div>
     );
@@ -308,7 +418,7 @@ export default function ServiceDetailPage({
 
           {/* 트렌드 차트 */}
           <div className="mb-6">
-            <TrendChart />
+            <TrendChart siteUrl={service.url} />
           </div>
         </main>
       </div>

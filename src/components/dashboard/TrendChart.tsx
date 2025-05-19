@@ -5,7 +5,7 @@
  * @description 서비스 검색 분석 데이터의 트렌드를 시각화하는 차트 컴포넌트
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   LineChart, 
   Line, 
@@ -18,45 +18,112 @@ import {
   Area,
   AreaChart
 } from 'recharts';
-
-// 목업 데이터
-const generateTrendData = (days: number) => {
-  const data = [];
-  const now = new Date();
-  
-  for (let i = days - 1; i >= 0; i--) {
-    const date = new Date(now);
-    date.setDate(date.getDate() - i);
-    
-    const baseClicks = 500 + Math.random() * 300;
-    const baseImpressions = 8000 + Math.random() * 4000;
-    
-    data.push({
-      date: date.toISOString().slice(0, 10),
-      clicks: Math.round(baseClicks * (1 + Math.sin(i / 5) * 0.3)),
-      impressions: Math.round(baseImpressions * (1 + Math.sin(i / 7) * 0.2)),
-      ctr: (baseClicks * (1 + Math.sin(i / 5) * 0.3) / baseImpressions * (1 + Math.sin(i / 7) * 0.2) * 100).toFixed(2),
-      position: (10 - 5 * Math.sin(i / 10)).toFixed(1)
-    });
-  }
-  
-  return data;
-};
+import { fetchSearchAnalytics, getDateRange } from '@/api/gscApi';
+import type { GSCSearchAnalyticsRow } from '@/api/types';
 
 type ChartType = 'line' | 'area';
 type MetricType = 'clicks' | 'impressions' | 'ctr' | 'position';
 type PeriodType = '7' | '30' | '90';
 
-export const TrendChart = () => {
+interface TrendChartProps {
+  /** 사이트 URL */
+  siteUrl?: string;
+}
+
+export const TrendChart = ({ siteUrl }: TrendChartProps) => {
   // 차트 타입 상태
   const [chartType, setChartType] = useState<ChartType>('line');
   // 선택된 기간
   const [period, setPeriod] = useState<PeriodType>('30');
   // 표시할 지표
   const [metrics, setMetrics] = useState<MetricType[]>(['clicks', 'impressions']);
+  // 차트 데이터
+  const [data, setData] = useState<any[]>([]);
+  // 로딩 상태
+  const [loading, setLoading] = useState<boolean>(false);
+  // 에러 상태
+  const [error, setError] = useState<string | null>(null);
   
-  // 목업 데이터 생성
-  const data = generateTrendData(parseInt(period));
+  // API에서 데이터 가져오기
+  useEffect(() => {
+    const fetchData = async () => {
+      // 사이트 URL이 없으면 목업 데이터 사용
+      if (!siteUrl) {
+        // 목업 데이터 생성
+        const mockData = generateMockData(parseInt(period));
+        setData(mockData);
+        return;
+      }
+      
+      try {
+        setLoading(true);
+        // 기간 설정
+        const days = parseInt(period);
+        const { startDate, endDate } = getDateRange(days);
+        
+        // API 호출
+        const response = await fetchSearchAnalytics(
+          siteUrl,
+          startDate,
+          endDate,
+          ['date'],  // 날짜별 데이터
+          days       // 기간만큼 데이터 요청
+        );
+        
+        // API 응답 데이터 변환
+        if (response.rows && response.rows.length > 0) {
+          const formattedData = response.rows.map((row: GSCSearchAnalyticsRow) => ({
+            date: row.keys[0],  // 첫 번째 차원은 날짜
+            clicks: row.clicks,
+            impressions: row.impressions,
+            ctr: (row.ctr * 100).toFixed(2),  // API는 0-1 사이 값, UI는 퍼센트로 표시
+            position: row.position.toFixed(1)
+          }));
+          
+          setData(formattedData);
+        } else {
+          // 데이터가 없으면 빈 배열 설정
+          setData([]);
+        }
+        
+        setError(null);
+      } catch (err) {
+        console.error('트렌드 데이터 로드 중 오류 발생:', err);
+        setError('트렌드 데이터를 불러오는 중 문제가 발생했습니다.');
+        // 오류 발생 시 목업 데이터로 대체
+        const mockData = generateMockData(parseInt(period));
+        setData(mockData);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [siteUrl, period]);
+  
+  // API 호출 전이나 오류 시 사용할 목업 데이터 생성 함수
+  const generateMockData = (days: number) => {
+    const mockData = [];
+    const now = new Date();
+    
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      
+      const baseClicks = 500 + Math.random() * 300;
+      const baseImpressions = 8000 + Math.random() * 4000;
+      
+      mockData.push({
+        date: date.toISOString().slice(0, 10),
+        clicks: Math.round(baseClicks * (1 + Math.sin(i / 5) * 0.3)),
+        impressions: Math.round(baseImpressions * (1 + Math.sin(i / 7) * 0.2)),
+        ctr: (baseClicks * (1 + Math.sin(i / 5) * 0.3) / baseImpressions * (1 + Math.sin(i / 7) * 0.2) * 100).toFixed(2),
+        position: (10 - 5 * Math.sin(i / 10)).toFixed(1)
+      });
+    }
+    
+    return mockData;
+  };
   
   // 지표 토글 핸들러
   const toggleMetric = (metric: MetricType) => {
