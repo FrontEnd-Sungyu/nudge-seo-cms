@@ -5,44 +5,50 @@
  * @description 서비스의 상세 정보와 KPI 지표를 보여주는 페이지
  */
 
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { Sidebar } from '../../components/layout/Sidebar'
-import { KpiCard } from '../../components/dashboard/KpiCard'
-import { TrendChart } from '../../components/dashboard/TrendChart'
-import { mockServices, getServiceGrowth } from '../../data/mockData'
-import type { Service, ServiceGrowth } from '../../types/service'
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Sidebar } from '@/components/layout/Sidebar';
+import { KpiCard } from '@/components/dashboard/KpiCard';
+import { TrendChart } from '@/components/dashboard/TrendChart';
+import { mockServices, getServiceGrowth } from '@/data/mockData';
+import type { Service, ServiceGrowth } from '@/types/service';
 import {
   formatDomain,
   formatNumber,
   formatPercent,
   formatGrowth,
   formatDate,
-} from '../../utils/formatter'
+} from '@/utils/formatter';
 
-export const ServiceDetailPage = () => {
-  const { serviceId } = useParams<{ serviceId: string }>()
-  const navigate = useNavigate()
+export default function ServiceDetailPage({ 
+  params 
+}: { 
+  params: { serviceId: string } 
+}) {
+  const { serviceId } = params;
+  const router = useRouter();
   
   // 현재 서비스 데이터
-  const [service, setService] = useState<Service | null>(null)
+  const [service, setService] = useState<Service | null>(null);
   // 서비스 증감률
-  const [growth, setGrowth] = useState<ServiceGrowth | null>(null)
+  const [growth, setGrowth] = useState<ServiceGrowth | null>(null);
 
   // 서비스 ID가 변경되면 서비스 데이터 로드
   useEffect(() => {
     // 실제로는 API 호출이지만 목업 데이터 사용
-    const selectedService = mockServices.find((s) => s.id === serviceId)
+    const selectedService = mockServices.find((s) => s.id === serviceId);
     if (selectedService) {
-      setService(selectedService)
-      setGrowth(getServiceGrowth())
+      setService(selectedService);
+      setGrowth(getServiceGrowth());
     }
-  }, [serviceId])
+  }, [serviceId]);
 
   // 서비스 변경 핸들러
   const handleServiceChange = (id: string) => {
-    navigate(`/services/${id}`)
-  }
+    router.push(`/services/${id}`);
+  };
 
   // 원본 서치콘솔로 이동
   const goToSearchConsole = () => {
@@ -50,9 +56,9 @@ export const ServiceDetailPage = () => {
       window.open(
         `https://search.google.com/search-console?resource_id=${encodeURIComponent(service.url)}`,
         '_blank',
-      )
+      );
     }
-  }
+  };
 
   if (!service || !growth) {
     return (
@@ -62,7 +68,7 @@ export const ServiceDetailPage = () => {
           <p className="mt-4 text-gray-600">서비스 데이터를 불러오는 중...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -307,7 +313,5 @@ export const ServiceDetailPage = () => {
         </main>
       </div>
     </div>
-  )
+  );
 }
-
-export default ServiceDetailPage

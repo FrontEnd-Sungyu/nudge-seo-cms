@@ -5,8 +5,8 @@
  * @description 서비스 상세 페이지에서 사용하는 좌측 내비게이션 바
  */
 
-import { mockServices } from '../../data/mockData';
-import { formatDomain } from '../../utils/formatter';
+import { mockServices } from '@/data/mockData';
+import { formatDomain } from '@/utils/formatter';
 
 interface SidebarProps {
   /** 현재 선택된 서비스 ID */

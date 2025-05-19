@@ -5,6 +5,8 @@
  * @description 앱 로고와 주요 액션 버튼을 포함한 헤더 컴포넌트
  */
 
+import Link from 'next/link';
+
 export const Header = () => {
   return (
     <header className="bg-white shadow-sm">
@@ -13,9 +15,11 @@ export const Header = () => {
           {/* 로고 및 앱 타이틀 */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="h-10 w-10 rounded-md bg-primary-600 text-white flex items-center justify-center text-xl font-bold">
-                S
-              </div>
+              <Link href="/">
+                <div className="h-10 w-10 rounded-md bg-primary-600 text-white flex items-center justify-center text-xl font-bold">
+                  S
+                </div>
+              </Link>
             </div>
             <div className="ml-4">
               <h1 className="text-xl font-bold text-gray-900">SEO 데이터 CMS</h1>

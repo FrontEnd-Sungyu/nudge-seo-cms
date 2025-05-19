@@ -5,21 +5,23 @@
  * @description 서비스 카드 목록을 표시하는 메인 대시보드 페이지
  */
 
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Header } from '../../components/common/Header'
-import { ServiceCard } from '../../components/dashboard/ServiceCard'
-import { mockServices } from '../../data/mockData'
-import type { Service } from '../../types/service'
+'use client';
 
-export const DashboardPage = () => {
-  const [services] = useState<Service[]>(mockServices)
-  const navigate = useNavigate()
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Header } from '@/components/common/Header';
+import { ServiceCard } from '@/components/dashboard/ServiceCard';
+import { mockServices } from '@/data/mockData';
+import type { Service } from '@/types/service';
+
+export default function HomePage() {
+  const [services] = useState<Service[]>(mockServices);
+  const router = useRouter();
 
   // 서비스 카드 클릭 핸들러
   const handleServiceClick = (id: string) => {
-    navigate(`/services/${id}`)
-  }
+    router.push(`/services/${id}`);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -83,7 +85,5 @@ export const DashboardPage = () => {
         <p>© 2025 SEO 데이터 CMS. 모든 권리 보유.</p>
       </footer>
     </div>
-  )
+  );
 }
-
-export default DashboardPage
