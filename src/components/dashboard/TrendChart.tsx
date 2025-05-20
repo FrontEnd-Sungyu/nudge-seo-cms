@@ -162,6 +162,32 @@ export const TrendChart = ({
     }
   }
 
+  // 왼쪽 Y축 레이블 가져오기
+  const getLeftAxisLabel = (): string => {
+    const leftAxisMetrics = metrics.filter(
+      (m) => m === 'clicks' || m === 'impressions',
+    )
+    if (leftAxisMetrics.length === 1) {
+      return labelMap[leftAxisMetrics[0]]
+    } else if (leftAxisMetrics.length === 2) {
+      return '클릭수 / 노출수'
+    }
+    return ''
+  }
+
+  // 오른쪽 Y축 레이블 가져오기
+  const getRightAxisLabel = (): string => {
+    const rightAxisMetrics = metrics.filter(
+      (m) => m === 'ctr' || m === 'position',
+    )
+    if (rightAxisMetrics.length === 1) {
+      return labelMap[rightAxisMetrics[0]]
+    } else if (rightAxisMetrics.length === 2) {
+      return 'CTR / 평균 순위'
+    }
+    return ''
+  }
+
   // 차트에서 사용할 색상 맵
   const colorMap: Record<MetricType, string> = {
     clicks: '#0284c7', // primary-600
@@ -270,13 +296,15 @@ export const TrendChart = ({
                 yAxisId="left"
                 orientation="left"
                 tick={{ fontSize: 12 }}
+                reversed={metrics.includes('position')}
+                hide={metrics.length > 2}
               />
               <YAxis
                 yAxisId="right"
                 orientation="right"
+                reversed={metrics.includes('position')}
                 tick={{ fontSize: 12 }}
-                domain={[0, 30]}
-                hide={!metrics.includes('position') && !metrics.includes('ctr')}
+                hide={metrics.length > 2}
               />
               <Tooltip
                 formatter={(value, name) => {
@@ -299,7 +327,7 @@ export const TrendChart = ({
 
               {metrics.includes('clicks') && (
                 <Line
-                  yAxisId="left"
+                  yAxisId={metrics.indexOf('clicks') === 0 ? 'left' : 'right'}
                   type="monotone"
                   dataKey="clicks"
                   stroke={colorMap.clicks}
@@ -310,7 +338,9 @@ export const TrendChart = ({
 
               {metrics.includes('impressions') && (
                 <Line
-                  yAxisId="left"
+                  yAxisId={
+                    metrics.indexOf('impressions') === 0 ? 'left' : 'right'
+                  }
                   type="monotone"
                   dataKey="impressions"
                   stroke={colorMap.impressions}
@@ -356,13 +386,31 @@ export const TrendChart = ({
                 yAxisId="left"
                 orientation="left"
                 tick={{ fontSize: 12 }}
+                hide={metrics.length > 2}
+                label={{
+                  value: getLeftAxisLabel(),
+                  angle: -90,
+                  position: 'insideLeft',
+                  style: { textAnchor: 'middle', fontSize: 10 },
+                  dx: -15,
+                }}
               />
               <YAxis
                 yAxisId="right"
                 orientation="right"
                 tick={{ fontSize: 12 }}
-                domain={[0, 30]}
-                hide={!metrics.includes('position') && !metrics.includes('ctr')}
+                domain={metrics.includes('position') ? [10, 1] : [0, 30]}
+                hide={
+                  metrics.length > 2 ||
+                  (!metrics.includes('position') && !metrics.includes('ctr'))
+                }
+                label={{
+                  value: getRightAxisLabel(),
+                  angle: 90,
+                  position: 'insideRight',
+                  style: { textAnchor: 'middle', fontSize: 10 },
+                  dx: 15,
+                }}
               />
               <Tooltip
                 formatter={(value, name) => {
@@ -385,7 +433,7 @@ export const TrendChart = ({
 
               {metrics.includes('clicks') && (
                 <Area
-                  yAxisId="left"
+                  yAxisId={metrics.indexOf('clicks') === 0 ? 'left' : 'right'}
                   type="monotone"
                   dataKey="clicks"
                   stroke={colorMap.clicks}
@@ -398,7 +446,9 @@ export const TrendChart = ({
 
               {metrics.includes('impressions') && (
                 <Area
-                  yAxisId="left"
+                  yAxisId={
+                    metrics.indexOf('impressions') === 0 ? 'left' : 'right'
+                  }
                   type="monotone"
                   dataKey="impressions"
                   stroke={colorMap.impressions}
