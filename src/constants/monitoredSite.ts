@@ -41,7 +41,7 @@ export const MONITORED_SITES = [
   {
     id: 'geniet',
     name: '지니어트',
-    url: 'https://geniet.moneple.com/',
+    url: 'https://geniet.co.kr/',
     iconUrl: '/assets/geniet.ico',
   },
 ]
