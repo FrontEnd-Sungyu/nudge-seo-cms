@@ -35,7 +35,7 @@ export interface Service {
  * @interface ServiceSummary
  * @description 서비스의 주요 KPI 요약 정보
  */
-export interface ServiceSummary {
+interface ServiceSummary {
   /** 총 클릭수 */
   clicks: number
   /** 총 노출수 */
