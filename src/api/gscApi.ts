@@ -150,7 +150,7 @@ export const fetchSitePeriodData = async (
   days: string = '7',
 ) => {
   try {
-    const response = await fetch(`/api/gsc/${siteId}/period?days=${days}`)
+    const response = await fetch(`/api/gsc/${siteId}?days=${days}`)
 
     if (!response.ok) {
       throw new Error(

@@ -29,7 +29,7 @@ export async function GET() {
 
     // 최신 데이터 날짜 (오늘로부터 3일 전)
     const latestDataDate = new Date(today)
-    latestDataDate.setDate(today.getDate())
+    latestDataDate.setDate(today.getDate() - 3)
 
     // 최근 7일 범위
     const endDate = latestDataDate.toISOString().split('T')[0]
@@ -39,7 +39,7 @@ export async function GET() {
 
     // 이전 7일 범위 (최근 7일 직전 7일)
     const prevEndDate = new Date(startDate)
-    prevEndDate.setDate(startDate.getDate())
+    prevEndDate.setDate(startDate.getDate() - 1)
     const prevEndDateStr = prevEndDate.toISOString().split('T')[0]
 
     const prevStartDate = new Date(prevEndDate)
