@@ -26,7 +26,7 @@ export const Sidebar = ({
       <div className="px-4 py-3 border-b border-gray-200">
         <Link href="/" className="flex items-center">
           <img
-            src="/logo-linkareer.png"
+            src="/assets/logo-linkareer.png"
             alt="SEO 데이터 CMS"
             className="h-8 w-8 rounded"
           />

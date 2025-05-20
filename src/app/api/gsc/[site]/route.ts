@@ -4,20 +4,7 @@
 import { NextRequest } from 'next/server'
 import { JWT } from 'google-auth-library'
 import { google } from 'googleapis'
-
-// 모니터링할 사이트 URL 매핑
-const siteUrls: Record<string, string> = {
-  linkareer: 'https://linkareer.com/',
-  community: 'https://community.linkareer.com/',
-  cbt: 'sc-domain:cbt-community.linkareer.com',
-}
-
-// 사이트 이름 매핑
-const siteNames: Record<string, string> = {
-  linkareer: '링커리어',
-  community: '링커리어 커뮤니티',
-  cbt: '링커리어 CBT 커뮤니티',
-}
+import { MONITORED_SITES } from '@/constants/monitoredSite'
 
 /**
  * 기간별 GSC 검색 통계 데이터를 가져옴
@@ -28,9 +15,9 @@ export async function GET(
 ) {
   try {
     const site = params.site
-    const siteUrl = siteUrls[site]
+    const monitoredSite = MONITORED_SITES.find(s => s.id === site)
 
-    if (!siteUrl) {
+    if (!monitoredSite) {
       return new Response(
         JSON.stringify({
           error: `지원하지 않는 사이트입니다: ${site}`,
@@ -41,6 +28,8 @@ export async function GET(
         },
       )
     }
+    
+    const siteUrl = monitoredSite.url
 
     // 쿼리 파라미터에서 기간 가져오기
     const { searchParams } = new URL(request.url)
@@ -159,7 +148,7 @@ export async function GET(
       JSON.stringify({
         site: {
           id: site,
-          name: siteNames[site] || site,
+          name: monitoredSite.name,
           url: siteUrl,
         },
         period: {
