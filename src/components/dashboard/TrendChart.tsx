@@ -158,32 +158,6 @@ export const TrendChart = ({
     }
   }
 
-  // 왼쪽 Y축 레이블 가져오기
-  const getLeftAxisLabel = (): string => {
-    const leftAxisMetrics = metrics.filter(
-      (m) => m === 'clicks' || m === 'impressions',
-    )
-    if (leftAxisMetrics.length === 1) {
-      return labelMap[leftAxisMetrics[0]]
-    } else if (leftAxisMetrics.length === 2) {
-      return '클릭수 / 노출수'
-    }
-    return ''
-  }
-
-  // 오른쪽 Y축 레이블 가져오기
-  const getRightAxisLabel = (): string => {
-    const rightAxisMetrics = metrics.filter(
-      (m) => m === 'ctr' || m === 'position',
-    )
-    if (rightAxisMetrics.length === 1) {
-      return labelMap[rightAxisMetrics[0]]
-    } else if (rightAxisMetrics.length === 2) {
-      return 'CTR / 평균 순위'
-    }
-    return ''
-  }
-
   // 차트에서 사용할 색상 맵
   const colorMap: Record<MetricType, string> = {
     clicks: '#0284c7', // primary-600
