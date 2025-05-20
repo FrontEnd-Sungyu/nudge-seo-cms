@@ -5,21 +5,19 @@
  * @description 서비스 검색 분석 데이터의 트렌드를 시각화하는 차트 컴포넌트
  */
 
-import { useState, useEffect } from 'react'
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Area,
-  AreaChart,
-} from 'recharts'
 import { fetchSearchAnalytics, getDateRange } from '@/api/gscApi'
 import type { GSCSearchAnalyticsRow } from '@/api/types'
+import { useEffect, useState } from 'react'
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
 
 type ChartType = 'line' | 'area'
 type MetricType = 'clicks' | 'impressions' | 'ctr' | 'position'
@@ -39,8 +37,6 @@ export const TrendChart = ({
   trendData,
   selectedPeriod = '7',
 }: TrendChartProps) => {
-  // 차트 타입 상태
-  const [chartType, setChartType] = useState<ChartType>('line')
   // 선택된 기간 (컴포넌트 내부용)
   const [period, setPeriod] = useState<PeriodType>(selectedPeriod)
   // 표시할 지표
@@ -209,35 +205,6 @@ export const TrendChart = ({
       {/* 차트 헤더 */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h3 className="text-lg font-medium text-gray-900">검색 트렌드</h3>
-
-        {/* 차트 타입 선택만 표시 (기간 선택은 상단 DateRangePicker로 이동) */}
-        <div className="flex items-center">
-          {/* 차트 타입 선택 */}
-          <div className="flex rounded-md shadow-sm" role="group">
-            <button
-              type="button"
-              className={`px-4 py-2 text-sm font-medium rounded-l-md ${
-                chartType === 'line'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-              }`}
-              onClick={() => setChartType('line')}
-            >
-              라인
-            </button>
-            <button
-              type="button"
-              className={`px-4 py-2 text-sm font-medium rounded-r-md ${
-                chartType === 'area'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-              }`}
-              onClick={() => setChartType('area')}
-            >
-              영역
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* 지표 선택 토글 */}
@@ -278,211 +245,157 @@ export const TrendChart = ({
       {/* 차트 */}
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
-          {chartType === 'line' ? (
-            <LineChart
-              data={data}
-              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis
-                dataKey="date"
-                tick={{ fontSize: 12 }}
-                tickFormatter={(value) => {
-                  const date = new Date(value)
-                  return `${date.getMonth() + 1}/${date.getDate()}`
-                }}
-              />
+          <LineChart
+            data={data}
+            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis
+              dataKey="date"
+              tick={{ fontSize: 12 }}
+              tickFormatter={(value) => {
+                const date = new Date(value)
+                return `${date.getMonth() + 1}/${date.getDate()}`
+              }}
+            />
+            <YAxis
+              yAxisId="left"
+              orientation="left"
+              tick={{ fontSize: 12 }}
+              hide={metrics.length > 2}
+              {...(metrics[0] === 'position' && {
+                domain: [1, 30],
+                reversed: true,
+              })}
+            />
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              tick={{ fontSize: 12 }}
+              hide={metrics.length > 2 || metrics.length === 1}
+              {...(metrics[1] === 'position' && {
+                domain: [1, 30],
+                reversed: true,
+              })}
+            />
+            {metrics.length > 2 && metrics.includes('clicks') && (
               <YAxis
-                yAxisId="left"
+                yAxisId="clicks-axis"
                 orientation="left"
-                tick={{ fontSize: 12 }}
-                reversed={metrics.includes('position')}
-                hide={metrics.length > 2}
+                tick={false}
+                axisLine={false}
               />
+            )}
+            {metrics.length > 2 && metrics.includes('impressions') && (
               <YAxis
-                yAxisId="right"
-                orientation="right"
-                reversed={metrics.includes('position')}
-                tick={{ fontSize: 12 }}
-                hide={metrics.length > 2}
-              />
-              <Tooltip
-                formatter={(value, name) => {
-                  if (name === 'clicks') return [`${value} 클릭`, '클릭수']
-                  if (name === 'impressions') return [`${value} 노출`, '노출수']
-                  if (name === 'ctr') return [`${value}%`, 'CTR']
-                  if (name === 'position') return [`${value}위`, '평균 순위']
-                  return [value, name]
-                }}
-                labelFormatter={(label) => {
-                  const date = new Date(label)
-                  return date.toLocaleDateString('ko-KR', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
-                }}
-              />
-              <Legend formatter={(value) => labelMap[value as MetricType]} />
-
-              {metrics.includes('clicks') && (
-                <Line
-                  yAxisId={metrics.indexOf('clicks') === 0 ? 'left' : 'right'}
-                  type="monotone"
-                  dataKey="clicks"
-                  stroke={colorMap.clicks}
-                  activeDot={{ r: 8 }}
-                  strokeWidth={2}
-                />
-              )}
-
-              {metrics.includes('impressions') && (
-                <Line
-                  yAxisId={
-                    metrics.indexOf('impressions') === 0 ? 'left' : 'right'
-                  }
-                  type="monotone"
-                  dataKey="impressions"
-                  stroke={colorMap.impressions}
-                  strokeWidth={2}
-                />
-              )}
-
-              {metrics.includes('ctr') && (
-                <Line
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="ctr"
-                  stroke={colorMap.ctr}
-                  strokeWidth={2}
-                />
-              )}
-
-              {metrics.includes('position') && (
-                <Line
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="position"
-                  stroke={colorMap.position}
-                  strokeWidth={2}
-                />
-              )}
-            </LineChart>
-          ) : (
-            <AreaChart
-              data={data}
-              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis
-                dataKey="date"
-                tick={{ fontSize: 12 }}
-                tickFormatter={(value) => {
-                  const date = new Date(value)
-                  return `${date.getMonth() + 1}/${date.getDate()}`
-                }}
-              />
-              <YAxis
-                yAxisId="left"
+                yAxisId="impressions-axis"
                 orientation="left"
-                tick={{ fontSize: 12 }}
-                hide={metrics.length > 2}
-                label={{
-                  value: getLeftAxisLabel(),
-                  angle: -90,
-                  position: 'insideLeft',
-                  style: { textAnchor: 'middle', fontSize: 10 },
-                  dx: -15,
-                }}
+                tick={false}
+                axisLine={false}
               />
+            )}
+            {metrics.length > 2 && metrics.includes('ctr') && (
               <YAxis
-                yAxisId="right"
+                yAxisId="ctr-axis"
                 orientation="right"
-                tick={{ fontSize: 12 }}
-                domain={metrics.includes('position') ? [10, 1] : [0, 30]}
-                hide={
-                  metrics.length > 2 ||
-                  (!metrics.includes('position') && !metrics.includes('ctr'))
+                tick={false}
+                axisLine={false}
+              />
+            )}
+            {metrics.length > 2 && metrics.includes('position') && (
+              <YAxis
+                yAxisId="position-axis"
+                orientation="right"
+                tick={false}
+                axisLine={false}
+                domain={[0, 30]}
+                reversed
+              />
+            )}
+            <Tooltip
+              formatter={(value, name) => {
+                if (name === 'clicks') return [`${value} 클릭`, '클릭수']
+                if (name === 'impressions') return [`${value} 노출`, '노출수']
+                if (name === 'ctr') return [`${value}%`, 'CTR']
+                if (name === 'position') return [`${value}위`, '평균 순위']
+                return [value, name]
+              }}
+              labelFormatter={(label) => {
+                const date = new Date(label)
+                return date.toLocaleDateString('ko-KR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+              }}
+            />
+            <Legend formatter={(value) => labelMap[value as MetricType]} />
+
+            {metrics.includes('clicks') && (
+              <Line
+                yAxisId={
+                  metrics.length <= 2
+                    ? metrics.indexOf('clicks') === 0
+                      ? 'left'
+                      : 'right'
+                    : `clicks-axis`
                 }
-                label={{
-                  value: getRightAxisLabel(),
-                  angle: 90,
-                  position: 'insideRight',
-                  style: { textAnchor: 'middle', fontSize: 10 },
-                  dx: 15,
-                }}
+                type="monotone"
+                dataKey="clicks"
+                stroke={colorMap.clicks}
+                activeDot={{ r: 8 }}
+                strokeWidth={2}
               />
-              <Tooltip
-                formatter={(value, name) => {
-                  if (name === 'clicks') return [`${value} 클릭`, '클릭수']
-                  if (name === 'impressions') return [`${value} 노출`, '노출수']
-                  if (name === 'ctr') return [`${value}%`, 'CTR']
-                  if (name === 'position') return [`${value}위`, '평균 순위']
-                  return [value, name]
-                }}
-                labelFormatter={(label) => {
-                  const date = new Date(label)
-                  return date.toLocaleDateString('ko-KR', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
-                }}
+            )}
+
+            {metrics.includes('impressions') && (
+              <Line
+                yAxisId={
+                  metrics.length <= 2
+                    ? metrics.indexOf('impressions') === 0
+                      ? 'left'
+                      : 'right'
+                    : `impressions-axis`
+                }
+                type="monotone"
+                dataKey="impressions"
+                stroke={colorMap.impressions}
+                strokeWidth={2}
               />
-              <Legend formatter={(value) => labelMap[value as MetricType]} />
+            )}
 
-              {metrics.includes('clicks') && (
-                <Area
-                  yAxisId={metrics.indexOf('clicks') === 0 ? 'left' : 'right'}
-                  type="monotone"
-                  dataKey="clicks"
-                  stroke={colorMap.clicks}
-                  fillOpacity={0.2}
-                  fill={colorMap.clicks}
-                  activeDot={{ r: 8 }}
-                  strokeWidth={2}
-                />
-              )}
+            {metrics.includes('ctr') && (
+              <Line
+                yAxisId={
+                  metrics.length <= 2
+                    ? metrics.indexOf('ctr') === 0
+                      ? 'left'
+                      : 'right'
+                    : `ctr-axis`
+                }
+                type="monotone"
+                dataKey="ctr"
+                stroke={colorMap.ctr}
+                strokeWidth={2}
+              />
+            )}
 
-              {metrics.includes('impressions') && (
-                <Area
-                  yAxisId={
-                    metrics.indexOf('impressions') === 0 ? 'left' : 'right'
-                  }
-                  type="monotone"
-                  dataKey="impressions"
-                  stroke={colorMap.impressions}
-                  fillOpacity={0.2}
-                  fill={colorMap.impressions}
-                  strokeWidth={2}
-                />
-              )}
-
-              {metrics.includes('ctr') && (
-                <Area
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="ctr"
-                  stroke={colorMap.ctr}
-                  fillOpacity={0.2}
-                  fill={colorMap.ctr}
-                  strokeWidth={2}
-                />
-              )}
-
-              {metrics.includes('position') && (
-                <Area
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="position"
-                  stroke={colorMap.position}
-                  fillOpacity={0.2}
-                  fill={colorMap.position}
-                  strokeWidth={2}
-                />
-              )}
-            </AreaChart>
-          )}
+            {metrics.includes('position') && (
+              <Line
+                yAxisId={
+                  metrics.length <= 2
+                    ? metrics.indexOf('position') === 0
+                      ? 'left'
+                      : 'right'
+                    : `position-axis`
+                }
+                type="monotone"
+                dataKey="position"
+                stroke={colorMap.position}
+                strokeWidth={2}
+              />
+            )}
+          </LineChart>
         </ResponsiveContainer>
       </div>
     </div>
