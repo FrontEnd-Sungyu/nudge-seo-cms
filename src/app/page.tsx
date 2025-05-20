@@ -182,7 +182,7 @@ export default function HomePage() {
                       <p className="text-blue-700">
                         <span className="font-semibold">
                           최신 데이터 기준일:{' '}
-                          {formatDate(new Date(latestDataDate))}{' '}
+                          {formatDate(new Date(latestDataDate), 'short')}{' '}
                         </span>
                         <span className="ml-1">
                           (Google Search Console은 데이터 처리에 약 3일이

@@ -262,7 +262,8 @@ export default function ServiceDetailPage({
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
               <div>
                 <span className="font-medium">최신 데이터 기준일:</span>{' '}
-                {latestDataDate && formatDate(new Date(latestDataDate), 'long')}
+                {latestDataDate &&
+                  formatDate(new Date(latestDataDate), 'short')}
                 <span className="ml-1 text-xs text-gray-500">
                   (Google Search Console은 데이터 처리에 약 3일이 소요됩니다)
                 </span>

@@ -14,7 +14,10 @@ const siteUrls: Record<string, string> = {
 /**
  * 특정 사이트의 GSC 검색 통계 데이터를 가져옴
  */
-export async function GET({ params }: { params: { site: string } }) {
+export async function GET(
+  _: Request,
+  { params }: { params: { site: string } },
+) {
   try {
     const site = params.site
     const siteUrl = siteUrls[site]

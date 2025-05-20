@@ -5,14 +5,13 @@
  * @description 메인 화면에서 각 서비스의 요약 정보를 카드 형태로 표시하며, 클릭시 상세 페이지로 이동합니다
  */
 
-import { useState } from 'react'
-import type { Service, ServiceGrowth } from '../../types/service'
+import type { Service } from '../../types/service'
 import {
+  formatDate,
   formatDomain,
+  formatGrowth,
   formatNumber,
   formatPercent,
-  formatGrowth,
-  formatDate,
 } from '../../utils/formatter'
 
 interface ServiceCardProps {
@@ -20,10 +19,10 @@ interface ServiceCardProps {
   service: Service
   /** 서비스 증감률 정보 (선택 사항, 없으면 기본값 사용) */
   growth?: {
-    clicks: number;
-    impressions: number;
-    ctr: number;
-    position: number;
+    clicks: number
+    impressions: number
+    ctr: number
+    position: number
   }
   /** 카드 클릭시 실행할 함수 */
   onClick: (id: string) => void
@@ -35,7 +34,7 @@ export const ServiceCard = ({ service, growth, onClick }: ServiceCardProps) => {
     clicks: 0,
     impressions: 0,
     ctr: 0,
-    position: 0
+    position: 0,
   }
 
   return (

@@ -50,10 +50,6 @@ export const TrendChart = ({
   ])
   // 차트 데이터
   const [data, setData] = useState<any[]>([])
-  // 로딩 상태
-  const [loading, setLoading] = useState<boolean>(false)
-  // 에러 상태
-  const [error, setError] = useState<string | null>(null)
 
   // 외부에서 제공된 선택된 기간이 변경되면 내부 상태 업데이트
   useEffect(() => {
@@ -91,7 +87,6 @@ export const TrendChart = ({
     }
 
     try {
-      setLoading(true)
       // 기간 설정
       const days = parseInt(period)
       const { startDate, endDate } = getDateRange(days)
@@ -122,16 +117,11 @@ export const TrendChart = ({
         // 데이터가 없으면 빈 배열 설정
         setData([])
       }
-
-      setError(null)
     } catch (err) {
       console.error('트렌드 데이터 로드 중 오류 발생:', err)
-      setError('트렌드 데이터를 불러오는 중 문제가 발생했습니다.')
       // 오류 발생 시 목업 데이터로 대체
       const mockData = generateMockData(parseInt(period))
       setData(mockData)
-    } finally {
-      setLoading(false)
     }
   }
 
