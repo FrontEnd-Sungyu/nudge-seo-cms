@@ -43,7 +43,7 @@ export const ServiceCard = ({ service, growth, onClick }: ServiceCardProps) => {
       className="card card-hover p-5 cursor-pointer transition-all duration-200 hover:translate-y-[-2px]"
       onClick={() => onClick(service.id)}
     >
-      <div className="flex items-center mb-4">
+      <div className="flex items-center mb-4 h-12">
         {service.iconUrl ? (
           <img
             src={service.iconUrl}
