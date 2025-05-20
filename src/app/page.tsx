@@ -9,8 +9,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Header } from '@/components/common/Header'
-import { ServiceCard } from '@/components/dashboard/ServiceCard'
+import { Header } from '@/components/Header'
+import { ServiceCard } from '@/container/ServiceCard'
 import { MONITORED_SITES, fetchAllSitesSummary } from '@/api/gscApi'
 import type { Service } from '@/types/service'
 import type { GSCSiteSummary } from '@/api/types'

@@ -11,10 +11,10 @@ import { MONITORED_SITES, fetchSitePeriodData } from '@/api/gscApi'
 import {
   DateRangePicker,
   PeriodType,
-} from '@/components/dashboard/DateRangePicker'
-import { KpiCard } from '@/components/dashboard/KpiCard'
-import { TrendChart } from '@/components/dashboard/TrendChart'
-import { Sidebar } from '@/components/layout/Sidebar'
+} from '@/container/DateRangePicker'
+import { KpiCard } from '@/container/KpiCard'
+import { TrendChart } from '@/container/TrendChart'
+import { Sidebar } from '@/container/Sidebar'
 import type { Service, ServiceGrowth } from '@/types/service'
 import {
   formatDate,
