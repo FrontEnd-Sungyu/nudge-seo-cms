@@ -40,7 +40,7 @@ export default function HomePage() {
         const mappedServices = summaryData.sites.map((site: GSCSiteSummary) => {
           // MONITORED_SITES에서 아이콘 URL 가져오기
           const monitoredSite = MONITORED_SITES.find((s) => s.id === site.id)
-
+          const lastUpdateDate = new Date().setDate(new Date().getDate() - 3)
           return {
             id: site.id,
             name: site.name,
@@ -63,8 +63,8 @@ export default function HomePage() {
               ctr: site.metrics?.ctr.change || 0,
               position: site.metrics?.position.change || 0,
             },
-            createdAt: new Date(),
-            lastUpdatedAt: new Date(),
+            createdAt: lastUpdateDate,
+            lastUpdatedAt: lastUpdateDate,
           }
         })
 

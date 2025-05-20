@@ -69,6 +69,7 @@ export default function ServiceDetailPage({
 
       // 모니터링 중인 사이트 정보 가져오기
       const monitoredSite = MONITORED_SITES.find((s) => s.id === serviceId)
+      const lastUpdateDate = new Date().setDate(new Date().getDate() - 3)
 
       if (!monitoredSite) {
         throw new Error('등록되지 않은 서비스입니다.')
@@ -113,8 +114,8 @@ export default function ServiceDetailPage({
           crawlRequests: 0, // API에서 제공하지 않음
           responseTime: 0, // API에서 제공하지 않음
         },
-        createdAt: new Date(),
-        lastUpdatedAt: new Date(),
+        createdAt: lastUpdateDate,
+        lastUpdatedAt: lastUpdateDate,
       }
 
       setService(serviceData)

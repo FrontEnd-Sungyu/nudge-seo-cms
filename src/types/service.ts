@@ -18,9 +18,9 @@ export interface Service {
   /** 서비스 요약 정보 */
   summary: ServiceSummary
   /** 서비스 등록 일시 */
-  createdAt: Date
+  createdAt: number
   /** 마지막 데이터 업데이트 일시 */
-  lastUpdatedAt?: Date
+  lastUpdatedAt?: number
   growth?: {
     clicks: number
     impressions: number
