@@ -137,3 +137,21 @@ export const fetchAllSitesData = async () => {
     throw error;
   }
 };
+
+/**
+ * 특정 사이트의 기간별 데이터를 가져옵니다.
+ */
+export const fetchSitePeriodData = async (siteId: string, days: string = '7') => {
+  try {
+    const response = await fetch(`/api/gsc/${siteId}/period?days=${days}`);
+    
+    if (!response.ok) {
+      throw new Error(`${siteId} 사이트의 기간별 데이터를 가져오는데 실패했습니다`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error(`${siteId} 사이트의 기간별 데이터 요청 오류:`, error);
+    throw error;
+  }
+};

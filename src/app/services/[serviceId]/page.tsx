@@ -5,123 +5,133 @@
  * @description 서비스의 상세 정보와 KPI 지표를 보여주는 페이지
  */
 
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Sidebar } from '@/components/layout/Sidebar';
-import { KpiCard } from '@/components/dashboard/KpiCard';
-import { TrendChart } from '@/components/dashboard/TrendChart';
-import { MONITORED_SITES, fetchSiteData } from '@/api/gscApi';
-import type { Service, ServiceGrowth } from '@/types/service';
-import type { GSCSiteData } from '@/api/types';
+import { MONITORED_SITES, fetchSitePeriodData } from '@/api/gscApi'
 import {
+  DateRangePicker,
+  PeriodType,
+} from '@/components/dashboard/DateRangePicker'
+import { KpiCard } from '@/components/dashboard/KpiCard'
+import { TrendChart } from '@/components/dashboard/TrendChart'
+import { Sidebar } from '@/components/layout/Sidebar'
+import type { Service, ServiceGrowth } from '@/types/service'
+import {
+  formatDate,
   formatDomain,
+  formatGrowth,
   formatNumber,
   formatPercent,
-  formatGrowth,
-  formatDate,
-} from '@/utils/formatter';
+} from '@/utils/formatter'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
-export default function ServiceDetailPage({ 
-  params 
-}: { 
-  params: { serviceId: string } 
+export default function ServiceDetailPage({
+  params,
+}: {
+  params: { serviceId: string }
 }) {
-  const { serviceId } = params;
-  const router = useRouter();
-  
-  // 현재 서비스 데이터
-  const [service, setService] = useState<Service | null>(null);
-  // 서비스 증감률
-  const [growth, setGrowth] = useState<ServiceGrowth | null>(null);
-  // 로딩 상태
-  const [loading, setLoading] = useState<boolean>(true);
-  // 에러 상태
-  const [error, setError] = useState<string | null>(null);
+  const { serviceId } = params
+  const router = useRouter()
 
-  // 서비스 ID가 변경되면 서비스 데이터 로드
+  // 현재 서비스 데이터
+  const [service, setService] = useState<Service>()
+  // 서비스 증감률
+  const [growth, setGrowth] = useState<ServiceGrowth>()
+  // 로딩 상태
+  const [loading, setLoading] = useState<boolean>(true)
+  // 에러 상태
+  const [error, setError] = useState<string | null>()
+  // 선택된 기간
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>('7')
+  // 최신 데이터 날짜
+  const [latestDataDate, setLatestDataDate] = useState<string>()
+  // 트렌드 데이터
+  const [trendData, setTrendData] = useState<any[]>([])
+
+  // 기간 변경 핸들러
+  const handlePeriodChange = (period: PeriodType) => {
+    setSelectedPeriod(period)
+  }
+
+  // 선택된 기간이 변경되면 데이터 다시 로드
   useEffect(() => {
-    // API에서 데이터 로드
-    const loadServiceData = async () => {
-      try {
-        setLoading(true);
-        
-        // API에서 사이트 데이터 가져오기
-        const siteData: GSCSiteData = await fetchSiteData(serviceId);
-        
-        // 모니터링 중인 사이트 정보 가져오기
-        const monitoredSite = MONITORED_SITES.find(s => s.id === serviceId);
-        
-        if (!monitoredSite) {
-          throw new Error('등록되지 않은 서비스입니다.');
-        }
-        
-        // 데이터를 Service 형식으로 변환
-        const rows = siteData.data.rows || [];
-        const lastRow = rows.length > 0 ? rows[rows.length - 1] : null;
-        
-        // 클릭 및 노출 수 합계 계산
-        const totalClicks = rows.reduce((sum, row) => sum + row.clicks, 0);
-        const totalImpressions = rows.reduce((sum, row) => sum + row.impressions, 0);
-        const avgCtr = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
-        
-        // 평균 포지션 계산
-        const avgPosition = rows.length > 0 
-          ? rows.reduce((sum, row) => sum + row.position, 0) / rows.length 
-          : 0;
-        
-        // ServiceGrowth 객체 생성 (API에서 제공하는 경우 사용, 없으면 0)
-        const calculatedGrowth: ServiceGrowth = {
-          clicks: 0,
-          impressions: 0,
-          ctr: 0,
-          position: 0,
-          indexed: 0,
-          notIndexed: 0,
-          crawlRequests: 0,
-          responseTime: 0
-        };
-        
-        // Service 객체 생성
-        const serviceData: Service = {
-          id: serviceId,
-          name: siteData.site.name || monitoredSite.name,
-          url: siteData.site.url || monitoredSite.url,
-          iconUrl: monitoredSite.iconUrl,
-          verified: true, // API에 접근 가능하면 인증된 것으로 간주
-          summary: {
-            clicks: totalClicks,
-            impressions: totalImpressions,
-            ctr: avgCtr,
-            position: avgPosition,
-            indexed: 0, // API에서 제공하지 않음
-            notIndexed: 0, // API에서 제공하지 않음
-            crawlRequests: 0, // API에서 제공하지 않음
-            responseTime: 0 // API에서 제공하지 않음
-          },
-          createdAt: new Date(),
-          lastUpdatedAt: new Date()
-        };
-        
-        setService(serviceData);
-        setGrowth(calculatedGrowth);
-        setError(null);
-      } catch (err) {
-        console.error('서비스 데이터 로드 중 오류 발생:', err);
-        setError('서비스 데이터를 불러오는 중 문제가 발생했습니다.');
-      } finally {
-        setLoading(false);
+    loadPeriodData()
+  }, [serviceId, selectedPeriod])
+
+  // 기간별 데이터 로드
+  const loadPeriodData = async () => {
+    try {
+      setLoading(true)
+
+      // API에서 기간별 데이터 가져오기
+      const periodData = await fetchSitePeriodData(serviceId, selectedPeriod)
+
+      // 모니터링 중인 사이트 정보 가져오기
+      const monitoredSite = MONITORED_SITES.find((s) => s.id === serviceId)
+
+      if (!monitoredSite) {
+        throw new Error('등록되지 않은 서비스입니다.')
       }
-    };
-    
-    loadServiceData();
-  }, [serviceId]);
+
+      // 최신 데이터 날짜 저장
+      if (periodData.latestDataDate) {
+        setLatestDataDate(periodData.latestDataDate)
+      }
+
+      // 트렌드 데이터 저장
+      if (periodData.detailData) {
+        setTrendData(periodData.detailData)
+      }
+
+      // 증감률 데이터 생성
+      const calculatedGrowth: ServiceGrowth = {
+        clicks: periodData.metrics.clicks.change || 0,
+        impressions: periodData.metrics.impressions.change || 0,
+        ctr: periodData.metrics.ctr.change || 0,
+        position: periodData.metrics.position.change || 0,
+        indexed: 0, // API에서 제공하지 않음
+        notIndexed: 0, // API에서 제공하지 않음
+        crawlRequests: 0, // API에서 제공하지 않음
+        responseTime: 0, // API에서 제공하지 않음
+      }
+
+      // Service 객체 생성
+      const serviceData: Service = {
+        id: serviceId,
+        name: periodData.site.name || monitoredSite.name,
+        url: periodData.site.url || monitoredSite.url,
+        iconUrl: monitoredSite.iconUrl,
+        verified: true, // API에 접근 가능하면 인증된 것으로 간주
+        summary: {
+          clicks: periodData.metrics.clicks.value || 0,
+          impressions: periodData.metrics.impressions.value || 0,
+          ctr: (periodData.metrics.ctr.value || 0) * 100, // API는 0-1 사이 값, UI는 퍼센트로 표시
+          position: periodData.metrics.position.value || 0,
+          indexed: 0, // API에서 제공하지 않음
+          notIndexed: 0, // API에서 제공하지 않음
+          crawlRequests: 0, // API에서 제공하지 않음
+          responseTime: 0, // API에서 제공하지 않음
+        },
+        createdAt: new Date(),
+        lastUpdatedAt: new Date(),
+      }
+
+      setService(serviceData)
+      setGrowth(calculatedGrowth)
+      setError(null)
+    } catch (err) {
+      console.error('서비스 데이터 로드 중 오류 발생:', err)
+      setError('서비스 데이터를 불러오는 중 문제가 발생했습니다.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // 서비스 변경 핸들러
   const handleServiceChange = (id: string) => {
-    router.push(`/services/${id}`);
-  };
+    router.push(`/services/${id}`)
+  }
 
   // 원본 서치콘솔로 이동
   const goToSearchConsole = () => {
@@ -129,9 +139,9 @@ export default function ServiceDetailPage({
       window.open(
         `https://search.google.com/search-console?resource_id=${encodeURIComponent(service.url)}`,
         '_blank',
-      );
+      )
     }
-  };
+  }
 
   // 로딩 중이거나 데이터 없음
   if (loading || (!service && !error)) {
@@ -142,9 +152,9 @@ export default function ServiceDetailPage({
           <p className="mt-4 text-gray-600">서비스 데이터를 불러오는 중...</p>
         </div>
       </div>
-    );
+    )
   }
-  
+
   // 에러 발생
   if (error || !service) {
     return (
@@ -169,16 +179,19 @@ export default function ServiceDetailPage({
           <h2 className="text-xl font-semibold mb-2">
             데이터를 불러올 수 없습니다
           </h2>
-          <p className="text-gray-500 mb-4">{error || '서비스 데이터를 찾을 수 없습니다.'}</p>
-          <button
-            onClick={() => router.push('/')}
-            className="btn-primary"
-          >
+          <p className="text-gray-500 mb-4">
+            {error || '서비스 데이터를 찾을 수 없습니다.'}
+          </p>
+          <button onClick={() => router.push('/')} className="btn-primary">
             메인 페이지로 돌아가기
           </button>
         </div>
       </div>
-    );
+    )
+  }
+
+  if (!growth) {
+    return null
   }
 
   return (
@@ -245,10 +258,22 @@ export default function ServiceDetailPage({
           </div>
 
           {/* 페이지 정보 및 업데이트 날짜 */}
-          <div className="px-6 py-2 bg-gray-50 border-t border-b border-gray-200 text-sm text-gray-600 flex justify-between">
-            <div>
-              마지막 데이터 업데이트:{' '}
-              {formatDate(service.lastUpdatedAt || service.createdAt, 'long')}
+          <div className="px-6 py-2 bg-gray-50 border-t border-b border-gray-200 text-sm text-gray-600">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
+              <div>
+                <span className="font-medium">최신 데이터 기준일:</span>{' '}
+                {latestDataDate && formatDate(new Date(latestDataDate), 'long')}
+                <span className="ml-1 text-xs text-gray-500">
+                  (Google Search Console은 데이터 처리에 약 3일이 소요됩니다)
+                </span>
+              </div>
+
+              {/* 기간 선택기 */}
+              <DateRangePicker
+                selectedPeriod={selectedPeriod}
+                onPeriodChange={handlePeriodChange}
+                latestDataDate={latestDataDate}
+              />
             </div>
           </div>
         </header>
@@ -418,10 +443,14 @@ export default function ServiceDetailPage({
 
           {/* 트렌드 차트 */}
           <div className="mb-6">
-            <TrendChart siteUrl={service.url} />
+            <TrendChart
+              siteUrl={service.url}
+              trendData={trendData}
+              selectedPeriod={selectedPeriod}
+            />
           </div>
         </main>
       </div>
     </div>
-  );
+  )
 }

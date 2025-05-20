@@ -7,9 +7,9 @@
  */
 export interface GSCSearchAnalyticsResponse {
   /** 응답 행 데이터 배열 */
-  rows?: GSCSearchAnalyticsRow[];
+  rows?: GSCSearchAnalyticsRow[]
   /** 응답 메타데이터 */
-  responseAggregationType?: string;
+  responseAggregationType?: string
 }
 
 /**
@@ -17,15 +17,15 @@ export interface GSCSearchAnalyticsResponse {
  */
 export interface GSCSearchAnalyticsRow {
   /** 검색 클릭수 */
-  clicks: number;
+  clicks: number
   /** 검색 노출수 */
-  impressions: number;
+  impressions: number
   /** 클릭률 (0-1 사이 값) */
-  ctr: number;
+  ctr: number
   /** 평균 검색 순위 */
-  position: number;
+  position: number
   /** 차원 값 (예: 날짜, 페이지, 쿼리 등) */
-  keys: string[];
+  keys: string[]
 }
 
 /**
@@ -35,21 +35,21 @@ export interface GSCSiteData {
   /** 사이트 정보 */
   site: {
     /** 사이트 ID */
-    id: string;
+    id: string
     /** 사이트 이름 */
-    name: string;
+    name: string
     /** 사이트 URL */
-    url: string;
-  };
+    url: string
+  }
   /** 기간 정보 */
   period: {
     /** 시작일 */
-    startDate: string;
+    startDate: string
     /** 종료일 */
-    endDate: string;
-  };
+    endDate: string
+  }
   /** 검색 분석 데이터 */
-  data: GSCSearchAnalyticsResponse;
+  data: GSCSearchAnalyticsResponse
 }
 
 /**
@@ -61,20 +61,21 @@ export interface GSCSummaryData {
     /** 현재 기간 */
     current: {
       /** 시작일 */
-      startDate: string;
+      startDate: string
       /** 종료일 */
-      endDate: string;
-    };
+      endDate: string
+    }
     /** 이전 기간 */
     previous: {
       /** 시작일 */
-      startDate: string;
+      startDate: string
       /** 종료일 */
-      endDate: string;
-    };
-  };
+      endDate: string
+    }
+  }
+  latestDataDate: string
   /** 사이트 데이터 배열 */
-  sites: GSCSiteSummary[];
+  sites: GSCSiteSummary[]
 }
 
 /**
@@ -82,42 +83,43 @@ export interface GSCSummaryData {
  */
 export interface GSCSiteSummary {
   /** 사이트 ID */
-  id: string;
+  id: string
   /** 사이트 이름 */
-  name: string;
+  name: string
   /** 사이트 URL */
-  url: string;
+  url: string
   /** 에러 메시지 (데이터 요청에 실패한 경우) */
-  error?: string;
+  error?: string
   /** 사이트 지표 데이터 */
   metrics?: {
     /** 클릭수 */
     clicks: {
       /** 값 */
-      value: number;
+      value: number
       /** 이전 기간 대비 변화량 (%) */
-      change: number;
-    };
+      change: number
+    }
     /** 노출수 */
     impressions: {
       /** 값 */
-      value: number;
+      value: number
       /** 이전 기간 대비 변화량 (%) */
-      change: number;
-    };
+      change: number
+    }
     /** 클릭률 */
     ctr: {
       /** 값 (0-1 사이 값) */
-      value: number;
+      value: number
       /** 이전 기간 대비 변화량 (%) */
-      change: number;
-    };
+      change: number
+    }
     /** 평균 검색 순위 */
     position: {
       /** 값 */
-      value: number;
+      value: number
       /** 이전 기간 대비 변화량 (%) */
-      change: number;
-    };
-  };
+      change: number
+    }
+  }
+  latestDataDate?: string
 }

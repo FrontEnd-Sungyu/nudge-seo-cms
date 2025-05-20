@@ -5,36 +5,42 @@
  * @description 서비스 카드 목록을 표시하는 메인 대시보드 페이지
  */
 
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Header } from '@/components/common/Header';
-import { ServiceCard } from '@/components/dashboard/ServiceCard';
-import { MONITORED_SITES, fetchAllSitesSummary } from '@/api/gscApi';
-import type { Service } from '@/types/service';
-import type { GSCSiteSummary } from '@/api/types';
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { Header } from '@/components/common/Header'
+import { ServiceCard } from '@/components/dashboard/ServiceCard'
+import { MONITORED_SITES, fetchAllSitesSummary } from '@/api/gscApi'
+import type { Service } from '@/types/service'
+import type { GSCSiteSummary } from '@/api/types'
+import { formatDate } from '@/utils/formatter'
 
 export default function HomePage() {
-  const [services, setServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const [services, setServices] = useState<Service[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const [latestDataDate, setLatestDataDate] = useState<string | null>(null)
+  const router = useRouter()
 
   // API에서 데이터 가져오기
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
-        
+        setLoading(true)
+
         // 실제 API 호출
-        const summaryData = await fetchAllSitesSummary();
-        
+        const summaryData = await fetchAllSitesSummary()
+
+        if (summaryData.latestDataDate) {
+          setLatestDataDate(summaryData.latestDataDate)
+        }
+
         // API 응답 데이터를 서비스 형식으로 변환
         const mappedServices = summaryData.sites.map((site: GSCSiteSummary) => {
           // MONITORED_SITES에서 아이콘 URL 가져오기
-          const monitoredSite = MONITORED_SITES.find(s => s.id === site.id);
-          
+          const monitoredSite = MONITORED_SITES.find((s) => s.id === site.id)
+
           return {
             id: site.id,
             name: site.name,
@@ -49,35 +55,35 @@ export default function HomePage() {
               indexed: 0, // API에서 제공하지 않음
               notIndexed: 0, // API에서 제공하지 않음
               crawlRequests: 0, // API에서 제공하지 않음
-              responseTime: 0 // API에서 제공하지 않음
+              responseTime: 0, // API에서 제공하지 않음
             },
             growth: {
               clicks: site.metrics?.clicks.change || 0,
               impressions: site.metrics?.impressions.change || 0,
               ctr: site.metrics?.ctr.change || 0,
-              position: site.metrics?.position.change || 0
+              position: site.metrics?.position.change || 0,
             },
             createdAt: new Date(),
-            lastUpdatedAt: new Date()
-          };
-        });
-        
-        setServices(mappedServices);
+            lastUpdatedAt: new Date(),
+          }
+        })
+
+        setServices(mappedServices)
       } catch (err) {
-        console.error('데이터 로드 중 오류 발생:', err);
-        setError('데이터를 불러오는 중 문제가 발생했습니다.');
+        console.error('데이터 로드 중 오류 발생:', err)
+        setError('데이터를 불러오는 중 문제가 발생했습니다.')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    
-    fetchData();
-  }, []);
+    }
+
+    fetchData()
+  }, [])
 
   // 서비스 카드 클릭 핸들러
   const handleServiceClick = (id: string) => {
-    router.push(`/services/${id}`);
-  };
+    router.push(`/services/${id}`)
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -153,6 +159,41 @@ export default function HomePage() {
               <p className="text-gray-500">
                 등록된 서비스의 주요 지표를 한눈에 확인하세요.
               </p>
+
+              {/* 데이터 최신 날짜 안내 */}
+              {latestDataDate && (
+                <div className="mt-2 bg-blue-50 border border-blue-200 rounded-md p-3 text-sm">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="h-5 w-5 text-blue-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="ml-3 flex-1">
+                      <p className="text-blue-700">
+                        <span className="font-semibold">
+                          최신 데이터 기준일:{' '}
+                          {formatDate(new Date(latestDataDate))}{' '}
+                        </span>
+                        <span className="ml-1">
+                          (Google Search Console은 데이터 처리에 약 3일이
+                          소요됩니다. 지표는 위 날짜를 기준으로 최근 7일간의
+                          집계 데이터입니다.)
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* 서비스 카드 그리드 */}
@@ -174,5 +215,5 @@ export default function HomePage() {
         <p>© 2025 SEO 데이터 CMS. 모든 권리 보유.</p>
       </footer>
     </div>
-  );
+  )
 }
