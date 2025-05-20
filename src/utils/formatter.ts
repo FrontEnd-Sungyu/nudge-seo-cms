@@ -43,7 +43,7 @@ export const formatPercent = (num: number, decimals = 1): string => {
  * @param {boolean} [inverse=false] - 반전 여부 (감소가 좋은 지표인 경우)
  * @returns {string} 포맷팅된 증감률 문자열
  */
-export const formatGrowth = (num: number, inverse = false): string => {
+export const formatGrowth = (num: number, inverse: boolean = false): string => {
   const isPositive = inverse ? num < 0 : num > 0
   const prefix = isPositive ? '+' : ''
 
@@ -56,12 +56,12 @@ export const formatGrowth = (num: number, inverse = false): string => {
  * @function formatDate
  * @description 날짜를 지정된 형식으로 포맷팅
  *
- * @param {Date} date - 포맷팅할 날짜
+ * @param {Date | number} date - 포맷팅할 날짜
  * @param {string} [format='short'] - 포맷 스타일 ('short', 'long', 'year-month', 'time')
  * @returns {string} 포맷팅된 날짜 문자열
  */
 export const formatDate = (
-  date: Date,
+  date: Date | number,
   format: 'short' | 'long' | 'year-month' | 'time' = 'short',
 ): string => {
   if (format === 'short') {

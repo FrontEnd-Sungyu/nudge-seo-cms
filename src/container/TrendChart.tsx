@@ -19,7 +19,6 @@ import {
   YAxis,
 } from 'recharts'
 
-type ChartType = 'line' | 'area'
 type MetricType = 'clicks' | 'impressions' | 'ctr' | 'position'
 type PeriodType = '7' | '28' | '90'
 
