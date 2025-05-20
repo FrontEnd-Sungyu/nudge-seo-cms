@@ -7,11 +7,8 @@
 
 'use client'
 
-import { MONITORED_SITES, fetchSitePeriodData } from '@/api/gscApi'
-import {
-  DateRangePicker,
-  PeriodType,
-} from '@/container/DateRangePicker'
+import { fetchSitePeriodData } from '@/api/gscApi'
+import { DateRangePicker, PeriodType } from '@/container/DateRangePicker'
 import { KpiCard } from '@/container/KpiCard'
 import { TrendChart } from '@/container/TrendChart'
 import { Sidebar } from '@/container/Sidebar'
@@ -25,6 +22,7 @@ import {
 } from '@/utils/formatter'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { MONITORED_SITES } from '@/constants/monitoredSite'
 
 export default function ServiceDetailPage({
   params,

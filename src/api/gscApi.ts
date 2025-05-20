@@ -5,6 +5,7 @@
  * @description Google Search Console API와 통신하는 함수들을 제공합니다.
  */
 
+import { MONITORED_SITES } from '@/constants/monitoredSite'
 import type {
   GSCSearchAnalyticsResponse,
   GSCSiteData,
@@ -15,30 +16,6 @@ import type {
  * GSC API 기본 URL
  */
 const API_BASE_URL = '/api/gsc'
-
-/**
- * 모니터링할 사이트 목록
- */
-export const MONITORED_SITES = [
-  {
-    id: 'linkareer',
-    name: '링커리어',
-    url: 'https://linkareer.com/',
-    iconUrl: '/logo-linkareer.png',
-  },
-  {
-    id: 'community',
-    name: '링커리어 커뮤니티',
-    url: 'https://community.linkareer.com/',
-    iconUrl: '/logo-linkareer.png',
-  },
-  {
-    id: 'cbt',
-    name: '링커리어 CBT 커뮤니티',
-    url: 'sc-domain:cbt-community.linkareer.com',
-    iconUrl: '/logo-linkareer.png',
-  },
-]
 
 /**
  * 날짜 범위 생성 함수
