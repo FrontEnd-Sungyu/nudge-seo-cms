@@ -1,23 +1,9 @@
 /**
  * 모든 사이트의 통합 요약 데이터를 제공하는 API 라우트
  */
+import { MONITORED_SITES } from '@/constants/monitoredSite'
 import { JWT } from 'google-auth-library'
 import { google } from 'googleapis'
-
-// 모니터링할 사이트 목록
-const sites = [
-  { id: 'linkareer', url: 'https://linkareer.com/', name: '링커리어' },
-  {
-    id: 'community',
-    url: 'https://community.linkareer.com/',
-    name: '링커리어 커뮤니티',
-  },
-  {
-    id: 'cbt',
-    url: 'sc-domain:cbt-community.linkareer.com',
-    name: '링커리어 CBT 커뮤니티',
-  },
-]
 
 /**
  * 모든 사이트의 GSC 요약 지표를 가져옴
@@ -58,7 +44,7 @@ export async function GET() {
 
     // 각 사이트별로 데이터 요청
     const results = await Promise.all(
-      sites.map(async (site) => {
+      MONITORED_SITES.map(async (site) => {
         try {
           // 현재 기간 데이터 요청
           const currentResponse = await webmasters.searchanalytics.query({
