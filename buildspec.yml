@@ -12,6 +12,11 @@ phases:
   post_build:
     commands:
       - rm -rf node_modules
+artifacts:
+  files:
+    - 'package*.json'
+    - 'public/**/*'
+    - '.next/**/*'
 cache:
   paths:
     - 'node_modules/**/*'
