@@ -15,7 +15,7 @@ export const MONITORED_SITES = [
     iconUrl: '/assets/logo-linkareer.png',
   },
   {
-    id: 'cbt community',
+    id: 'cbt',
     name: '링커리어 CBT 커뮤니티',
     url: 'sc-domain:cbt-community.linkareer.com',
     iconUrl: '/assets/logo-linkareer.png',
