@@ -12,14 +12,6 @@ phases:
   post_build:
     commands:
       - rm -rf node_modules
-artifacts:
-  files:
-    - 'package*.json'
-    - 'public/**/*'
-    - 'src/app.modules/graphql/*'
-    - '.next/**/*'
-    - '.ebextensions/**/*'
-    - '.npmrc'
 cache:
   paths:
     - 'node_modules/**/*'
