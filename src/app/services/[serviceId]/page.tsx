@@ -346,8 +346,8 @@ export default function ServiceDetailPage({
             <KpiCard
               title="평균 게재순위"
               value={service.summary.position.toFixed(1)}
-              growth={formatGrowth(growth.position, true)} // 순위는 낮을수록 좋음
-              isPositive={growth.position < 0}
+              growth={formatGrowth(growth.position, false)}
+              isPositive={growth.position > 0}
               icon={
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
