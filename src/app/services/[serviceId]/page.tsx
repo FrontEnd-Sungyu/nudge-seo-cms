@@ -283,7 +283,7 @@ export default function ServiceDetailPage({
           {/* KPI 카드 그리드 */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <KpiCard
-              title="클릭수"
+              title="총 클릭수"
               value={formatNumber(service.summary.clicks)}
               growth={formatGrowth(growth.clicks)}
               isPositive={growth.clicks > 0}
@@ -303,7 +303,7 @@ export default function ServiceDetailPage({
               }
             />
             <KpiCard
-              title="노출수"
+              title="총 노출수"
               value={formatNumber(service.summary.impressions)}
               growth={formatGrowth(growth.impressions)}
               isPositive={growth.impressions > 0}
@@ -324,7 +324,7 @@ export default function ServiceDetailPage({
               }
             />
             <KpiCard
-              title="CTR"
+              title="평균 CTR"
               value={formatPercent(service.summary.ctr)}
               growth={formatGrowth(growth.ctr)}
               isPositive={growth.ctr > 0}
@@ -344,7 +344,7 @@ export default function ServiceDetailPage({
               }
             />
             <KpiCard
-              title="평균 순위"
+              title="평균 게재순위"
               value={service.summary.position.toFixed(1)}
               growth={formatGrowth(growth.position, true)} // 순위는 낮을수록 좋음
               isPositive={growth.position < 0}

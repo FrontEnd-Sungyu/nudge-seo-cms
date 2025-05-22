@@ -16,9 +16,9 @@ export interface GSCSearchAnalyticsResponse {
  * Search Analytics 행 데이터 타입
  */
 export interface GSCSearchAnalyticsRow {
-  /** 검색 클릭수 */
+  /** 검색 총 클릭수 */
   clicks: number
-  /** 검색 노출수 */
+  /** 검색 총 노출수 */
   impressions: number
   /** 클릭률 (0-1 사이 값) */
   ctr: number
@@ -92,14 +92,14 @@ export interface GSCSiteSummary {
   error?: string
   /** 사이트 지표 데이터 */
   metrics?: {
-    /** 클릭수 */
+    /** 총 클릭수 */
     clicks: {
       /** 값 */
       value: number
       /** 이전 기간 대비 변화량 (%) */
       change: number
     }
-    /** 노출수 */
+    /** 총 노출수 */
     impressions: {
       /** 값 */
       value: number

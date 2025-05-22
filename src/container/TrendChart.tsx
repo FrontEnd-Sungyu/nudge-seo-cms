@@ -167,10 +167,10 @@ export const TrendChart = ({
 
   // 차트에서 사용할 레이블 맵
   const labelMap: Record<MetricType, string> = {
-    clicks: '클릭수',
-    impressions: '노출수',
-    ctr: 'CTR (%)',
-    position: '평균 순위',
+    clicks: '총 클릭수',
+    impressions: '총 노출수',
+    ctr: '평균 CTR (%)',
+    position: '평균 게재순위',
   }
 
   return (
@@ -287,10 +287,11 @@ export const TrendChart = ({
             )}
             <Tooltip
               formatter={(value, name) => {
-                if (name === 'clicks') return [`${value} 클릭`, '클릭수']
-                if (name === 'impressions') return [`${value} 노출`, '노출수']
-                if (name === 'ctr') return [`${value}%`, 'CTR']
-                if (name === 'position') return [`${value}위`, '평균 순위']
+                if (name === 'clicks') return [`${value} 클릭`, '총 클릭수']
+                if (name === 'impressions')
+                  return [`${value} 노출`, '총 노출수']
+                if (name === 'ctr') return [`${value}%`, '평균 CTR']
+                if (name === 'position') return [`${value}위`, '평균 게재순위']
                 return [value, name]
               }}
               labelFormatter={(label) => {

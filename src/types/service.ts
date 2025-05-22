@@ -36,9 +36,9 @@ export interface Service {
  * @description 서비스의 주요 KPI 요약 정보
  */
 interface ServiceSummary {
-  /** 총 클릭수 */
+  /** 총 총 클릭수 */
   clicks: number
-  /** 총 노출수 */
+  /** 총 총 노출수 */
   impressions: number
   /** 클릭률 (%) */
   ctr: number
@@ -61,13 +61,13 @@ interface ServiceSummary {
  * @description 이전 기간 대비 KPI 증감률
  */
 export interface ServiceGrowth {
-  /** 클릭수 증감률 (%) */
+  /** 총 클릭수 증감률 (%) */
   clicks: number
-  /** 노출수 증감률 (%) */
+  /** 총 노출수 증감률 (%) */
   impressions: number
   /** 클릭률 증감률 (%) */
   ctr: number
-  /** 평균 순위 증감률 (%) - 음수가 좋음 */
+  /** 평균 게재순위 증감률 (%) - 음수가 좋음 */
   position: number
   /** 색인 페이지 증감률 (%) */
   indexed: number

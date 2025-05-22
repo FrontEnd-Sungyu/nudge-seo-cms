@@ -63,13 +63,13 @@ export const ServiceCard = ({ service, growth, onClick }: ServiceCardProps) => {
 
       <div className="grid grid-cols-2 gap-3 mb-3">
         <KpiItem
-          label="클릭수"
+          label="총 클릭수"
           value={formatNumber(service.summary.clicks, true)}
           growth={formatGrowth(growthData.clicks)}
           isPositive={growthData.clicks > 0}
         />
         <KpiItem
-          label="노출수"
+          label="총 노출수"
           value={formatNumber(service.summary.impressions, true)}
           growth={formatGrowth(growthData.impressions)}
           isPositive={growthData.impressions > 0}
@@ -78,13 +78,13 @@ export const ServiceCard = ({ service, growth, onClick }: ServiceCardProps) => {
 
       <div className="grid grid-cols-2 gap-3 mb-3">
         <KpiItem
-          label="CTR"
+          label="평균 CTR"
           value={formatPercent(service.summary.ctr)}
           growth={formatGrowth(growthData.ctr)}
           isPositive={growthData.ctr > 0}
         />
         <KpiItem
-          label="평균 순위"
+          label="평균 게재순위"
           value={service.summary.position.toFixed(1)}
           growth={formatGrowth(growthData.position, true)} // 순위는 낮을수록 좋음
           isPositive={growthData.position < 0}
