@@ -15,6 +15,12 @@ export const MONITORED_SITES = [
     iconUrl: '/assets/logo-linkareer.png',
   },
   {
+    id: 'cbt community',
+    name: '링커리어 CBT 커뮤니티',
+    url: 'sc-domain:cbt-community.linkareer.com',
+    iconUrl: '/assets/logo-linkareer.png',
+  },
+  {
     id: 'global-cashwalk',
     name: '글로벌 캐시워크',
     url: 'https://cashwalklabs.io/',
@@ -37,5 +43,11 @@ export const MONITORED_SITES = [
     name: '지니어트',
     url: 'https://geniet.co.kr/',
     iconUrl: '/assets/geniet.ico',
+  },
+  {
+    id: 'teamwalk',
+    name: '팀워크',
+    url: 'https://www.teamwalk.io/',
+    iconUrl: '/assets/teamwalk.ico',
   },
 ]

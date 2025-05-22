@@ -180,6 +180,8 @@ Content-Type: application/json
 }
 ```
 
-## License
+## 빈즈톡 배포 zip 만들기
 
-MIT
+```
+zip -r nextjs-app.zip .next public package.json package-lock.json Procfile
+```
