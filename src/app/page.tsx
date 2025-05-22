@@ -213,7 +213,7 @@ export default function HomePage() {
       </main>
 
       <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm text-gray-500">
-        <p>© 2025 SEO 데이터 CMS. 모든 권리 보유.</p>
+        <p>© 2025 넛지 SEO 통합 CMS. 모든 권리 보유.</p>
       </footer>
     </div>
   )

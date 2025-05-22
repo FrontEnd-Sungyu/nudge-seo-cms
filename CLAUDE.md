@@ -54,9 +54,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 모든 질문에 대해 답변시 추가적으로 고려해야 하는 부분도 함께 설명합니다.
 - 모든 질문에 대해 코드 작성은 별도 작성 요청을 하지 않는 경우 적용하지 않습니다.
 - 개발 코드 작성시 함수나 hook등을 생성할 땐 항상 jsDoc 형식의 주석을 함께 추가하여 어떤 기능을 제공하는지 설명하도록 합니다.
-- 기능 개발의 경우 아래 SEO 데이터 CMS 기획서를 바탕으로 개발하도록 합니다
+- 기능 개발의 경우 아래 넛지 SEO 통합 CMS 기획서를 바탕으로 개발하도록 합니다
 
-# SEO 데이터 CMS 기획서
+# 넛지 SEO 통합 CMS 기획서
 
 ## 1. 프로젝트 개요
 

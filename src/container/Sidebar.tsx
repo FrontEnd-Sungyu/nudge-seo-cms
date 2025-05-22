@@ -25,14 +25,14 @@ export const Sidebar = ({
       {/* 로고 및 메인화면 링크 */}
       <div className="px-4 py-3 border-b border-gray-200">
         <Link href="/" className="flex items-center">
-          <img
-            src="/assets/logo-linkareer.png"
-            alt="SEO 데이터 CMS"
-            className="h-8 w-8 rounded"
-          />
+          <div className="flex-shrink-0">
+            <div className="h-10 w-10 rounded-md bg-primary-600 text-white flex items-center justify-center text-xl font-bold">
+              S
+            </div>
+          </div>
           <div className="ml-2">
             <span className="text-sm font-semibold text-gray-900">
-              SEO 데이터 CMS
+              넛지 SEO 통합 CMS
             </span>
           </div>
         </Link>

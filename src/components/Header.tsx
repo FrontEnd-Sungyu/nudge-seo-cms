@@ -23,7 +23,7 @@ export const Header = () => {
             </div>
             <div className="ml-4">
               <h1 className="text-xl font-bold text-gray-900">
-                SEO 데이터 CMS
+                넛지 SEO 통합 CMS
               </h1>
               <p className="text-xs text-gray-500">
                 Search Console 통합 모니터링
